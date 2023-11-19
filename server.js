@@ -1,16 +1,59 @@
 //git push 'git branch -M main' and 'git push -u origin main'. and add remote 'git remote add origin https://github.com/Harmehar-kaur/MEAN-basics-.git'
 
 
-//imports 
-const http = require('http'); 
-const app = require('./backend/app');
+const app = require("./backend/app");
+const debug = require("debug")("node-angular");
+const http = require("http");
 
-//defining variables 
-const port =3000 || process.env.port; 
+const normalizePort = val => {
+  var port = parseInt(val, 10);
 
-//setting the port 
-app.set('port',port); 
-const server = http.createServer(app); 
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
 
-//listening to the server 
-server.listen(port); 
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+};
+
+const onError = error => {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+};
+
+const onListening = () => {
+  const addr = server.address();
+  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
+  debug("Listening on " + bind);
+};
+
+const port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
+
+const server = http.createServer(app);
+
+//setting up server to listen error 
+server.on("error", onError);
+
+//setting up server to listening 
+server.on("listening", onListening);
+server.listen(port);
