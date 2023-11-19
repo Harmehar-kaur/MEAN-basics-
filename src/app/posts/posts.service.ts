@@ -12,9 +12,10 @@ export class PostsService {
   constructor(private http: HttpClient){}
 
   getPosts() {
-    this.http.get('http://localhost:3000/api/posts')
-    .subscribe(() =>{
-      
+    this.http.get<{message:string, posts:Post[]}>('http://localhost:3000/api/posts')
+    .subscribe((postData) =>{
+      this.posts = postData.posts; 
+      this.postsUpdated.next([...this.posts]); 
     }); 
   }
 
@@ -23,7 +24,7 @@ export class PostsService {
   }
 
   addPost(title: string, content: string) {
-    const post: Post = {title: title, content: content};
+    const post: Post = { title: title, content: content, id: ''};
     this.posts.push(post);
     this.postsUpdated.next([...this.posts]);
   }
